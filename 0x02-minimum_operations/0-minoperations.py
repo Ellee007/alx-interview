@@ -1,31 +1,28 @@
 #!/usr/bin/python3
-"""
-This is our python module
-"""
-
-
-def recursive_func(n, i, c, s):
-    """
-    Recursive function
-    """
-    if i > n:
-        return 0
-    elif i == n:
-        return s
-    elif s == n:
-        return 0
-    s = s + 1
-    a = recursive_func(n, i, i, s)
-    b = recursive_func(n, i + c, c, s)
-    if min(a, b) == 0:
-        return max(a, b)
-    return min(a, b)
+"""This module contains a function that returns a list of lists of integers representing the Pascal's triangle of n"""
 
 
 def minOperations(n):
-    """
-    This is our minOperation function
-    """
-    if n <= 1:
+    """Returns a list of lists of integers representing the Pascal's triangle of n"""
+    # If n is less than or equal to 0, return an empty list
+    if n < 2:
         return 0
-    return recursive_func(n, 1, 0, 0)
+
+    # Initialize the number of operations to 0
+    num_operations = 0
+
+    # While n is greater than 1
+    while n > 1:
+        # If n is divisible by 2
+        if n % 2 == 0:
+            # Divide n by 2
+            n = n / 2
+        # If n is not divisible by 2
+        else:
+            # Add 1 to n
+            n = n + 1
+        # Add 1 to the number of operations
+        num_operations += 1
+
+    # Return the number of operations
+    return num_operations
