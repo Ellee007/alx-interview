@@ -1,44 +1,55 @@
 #!/usr/bin/python3
 """
-Log Parser
-Reads from stdin line by line and computes metrics
+This is our python module
 """
-from sys import stdin
-
-count = 0
-file_size = 0
-status_codes = {'200': 0, '301': 0, '400': 0, '401': 0,
-                '403': 0, '404': 0, '405': 0, '500': 0
-                }
+import sys
+"""
+This is sys module
+"""
 
 
-def print_output():
+i = 0
+total_size = 0
+status_codes = {200: 0,
+                301: 0,
+                400: 0,
+                401: 0,
+                403: 0,
+                404: 0,
+                405: 0,
+                500: 0}
+
+
+def print_func(t_size, s_codes):
     """
-    Helper function to print computed statistics
+    This is print function
     """
-    print("File size: {}".format(file_size))
-    codes = sorted(status_codes.keys())
-    for code in codes:
-        if status_codes[code] != 0:
-            print("{}: {}".format(code, status_codes[code]))
+    print("File size:", t_size)
+    for key, value in s_codes.items():
+        if value != 0:
+            print("{}: {}".format(key, value))
 
 
-if __name__ == "__main__":
-    try:
-        for line in stdin:
-            line = line.rstrip('\n')
-            try:
-                status_code = line.split()[-2]
-                size = int(line.split()[-1])
-            except Exception:
-                pass
-            if status_code in status_codes.keys():
-                status_codes[status_code] += 1
-            file_size += size
-            count = count + 1
-            if count % 10 == 0:
-                print_output()
-    except KeyboardInterrupt:
-        print_output()
-        raise
-    print_output()
+try:
+    for line in sys.stdin:
+        i = i + 1
+        status = 0
+        fsize = 0
+        final_split = line.split()
+        try:
+            fsize = int(final_split[-1])
+            total_size = total_size + fsize
+        except Exception as e:
+            continue
+        try:
+            status = int(final_split[-2])
+            if status in status_codes.keys():
+                status_codes[status] = status_codes[status] + 1
+        except Exception as e:
+            continue
+        if i == 10:
+            i = 0
+            print_func(total_size, status_codes)
+    print_func(total_size, status_codes)
+except KeyboardInterrupt:
+    print_func(total_size, status_codes)
