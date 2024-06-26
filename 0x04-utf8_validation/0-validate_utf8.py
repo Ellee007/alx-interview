@@ -1,31 +1,41 @@
 #!/usr/bin/python3
 """
-Determine if a given data set is a valid utf8 encoding
+UTF-8 Validation 
 """
 
 
 def validUTF8(data):
-    """ Check if data represents valid utf8 encoding """
-    num_bytes_to_check = 0
+    """
+    determines if a given data set represents a valid UTF-8 encoding
+    """
+    # Number of bytes in the current UTF-8 character
+    n_bytes = 0
 
-    for byte in data:
-        if num_bytes_to_check == 0:
-            # With a right sift by 7 positions, all single byte
-            # characters starts with a 0
-            if (byte >> 7) == 0b0:
+    # Mask to check if the most significant bit is set or not
+    mask1 = 1 << 7
+
+    # Mask to check if the second most significant bit is set or not
+    mask2 = 1 << 6
+    for num in data:
+
+        # Get the bit pattern of the current byte
+        mask = 1 << 7
+        if n_bytes == 0:
+            while mask & num:
+                n_bytes += 1
+                mask = mask >> 1
+
+            # 1 byte characters
+            if n_bytes == 0:
                 continue
-            # To examine if the first 3 bits starts with '110'
-            elif (byte >> 5) == 0b110:
-                num_bytes_to_check = 1
-            elif (byte >> 4) == 0b1110:
-                num_bytes_to_check = 2
-            elif (byte >> 3) == 0b11110:
-                num_bytes_to_check = 3
-            else:
+
+            # Invalid scenarios according to the rules of the problem
+            if n_bytes == 1 or n_bytes > 4:
                 return False
         else:
-            if (byte >> 6) != 0b10:
-                return False
-            num_bytes_to_check -= 1
 
-    return num_bytes_to_check == 0
+            # If this byte is a part of an existing UTF-8 character,
+            if not (num & mask1 and not (num & mask2)):
+                return False
+        n_bytes -= 1
+    return n_bytes == 0
