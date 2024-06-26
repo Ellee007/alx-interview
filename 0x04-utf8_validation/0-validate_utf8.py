@@ -1,43 +1,31 @@
-!/usr/bin/python3
+#!/usr/bin/python3
 """
-This is our python module
+Determine if a given data set is a valid utf8 encoding
 """
 
 
 def validUTF8(data):
-    """
-    This is a function that checks if data is a valid utf8 incoding
-    """
-    continuation = 0
-    for d in data:
-        binary_d = bin(d)[2:]
-        length = len(binary_d)
-        if length > 8:
-            binary_d = binary_d[length - 8:]
-            d = int(binary_d, 2)
-        elif length < 8:
-            for i in range(8 - length):
-                binary_d = "0" + binary_d
-        if continuation == 0:
-            if binary_d[0] == "0":
+    """ Check if data represents valid utf8 encoding """
+    num_bytes_to_check = 0
+
+    for byte in data:
+        if num_bytes_to_check == 0:
+            # With a right sift by 7 positions, all single byte
+            # characters starts with a 0
+            if (byte >> 7) == 0b0:
                 continue
-            if binary_d[1:3] == "10":
-                continuation = 1
-            elif binary_d[1:4] == "110":
-                continuation = 2
-            elif binary_d[1:5] == "1110":
-                continuation = 3
-            elif binary_d[1:6] == "11110":
-                continuation = 4
-            elif binary_d[1:7] == "111110":
-                continuation = 5
+            # To examine if the first 3 bits starts with '110'
+            elif (byte >> 5) == 0b110:
+                num_bytes_to_check = 1
+            elif (byte >> 4) == 0b1110:
+                num_bytes_to_check = 2
+            elif (byte >> 3) == 0b11110:
+                num_bytes_to_check = 3
             else:
                 return False
-            continue
-        if binary_d[0:2] == "10":
-            continuation = continuation - 1
         else:
-            return False
-    if continuation != 0:
-        return False
-    return True
+            if (byte >> 6) != 0b10:
+                return False
+            num_bytes_to_check -= 1
+
+    return num_bytes_to_check == 0
