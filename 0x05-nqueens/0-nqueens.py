@@ -1,48 +1,48 @@
-#!/usr/bin/env python3
-"""
-This is our python module
-"""
+#!/usr/bin/python3
+
+"""This module contains a function that solves the N queens puzzle"""
+
 import sys
-"""
-This is our sys module
-"""
 
 
-if len(sys.argv) != 2:
-    print("Usage: nqueens N")
-    sys.exit(1)
-n = 0
-try:
-    n = int(sys.argv[1])
-except Exception as e:
-    print("N must be a number")
-    sys.exit(1)
-if n < 4:
-    print("N must be at least 4")
-    sys.exit(1)
+def is_safe(board, row, col):
+    # Check if the current position is safe to place a queen
+    for i in range(row):
+        if board[i] == col or \
+           board[i] == col - (row - i) or \
+           board[i] == col + (row - i):
+            return False
+    return True
 
-elems_set = {i for i in range(n)}
-def recusive(elem, i, elems_set, returned_list, ignored_set):
-    returned_list.append([i, elem])
-    i += 1
-    elems_set.remove(elem)
 
-    j = i
-    ind1 = elem
-    ind2 = elem
-    while j < n:
-        ind1 += 1
-        if ind1 < n:
-            ignored_set.add([j, ind1])
-        ind2 -= 1
-        if ind2 >= 0:
-            ignored_set.add([j, ind2])
-        j += 1
-    for e in elems_set:
-        search_list = [i, e]
-        if search_list in ignored_set:
-            ignored_set.remove(search_list)
-            elems_set.remove(e)
-    for j in elems_set:
-        if i < n:
-            recusive(j, i, elems_set, returned_list, ignored_set)
+def solve_n_queens(n, board=[], row=0):
+    if row == n:
+        # Base case: all queens have been placed
+        print(board)
+        return
+
+    for col in range(n):
+        if is_safe(board, row, col):
+            # Place a queen at the current position
+            board.append(col)
+            solve_n_queens(n, board, row + 1)
+            # Backtrack: remove the queen at the current position
+            board.pop()
+
+
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print("Usage: nqueens N")
+        sys.exit(1)
+
+    try:
+        n = int(sys.argv[1])
+    except ValueError:
+        print("N must be a number")
+        sys.exit(1)
+
+    if n < 4:
+        print("N must be at least 4")
+        sys.exit(1)
+
+    solve_n_queens(n)
